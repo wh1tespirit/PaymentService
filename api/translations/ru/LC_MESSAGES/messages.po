@@ -1,0 +1,18 @@
+msgid "error_1"
+msgstr "Внутренняя ошибка сервера"
+
+msgid "error_2"
+msgstr "Неверный запрос"
+
+msgid "error_3"
+msgstr "Ошибка валидации"
+
+msgid "error_4"
+msgstr "Доступ запрещен"
+
+msgid "error_5"
+msgstr "Объект не найден"
+
+msgid "error_6"
+msgstr "Объект уже существует"
+

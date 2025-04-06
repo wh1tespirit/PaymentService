@@ -1,0 +1,17 @@
+msgid "error_1"
+msgstr "Internal Server Error"
+
+msgid "error_2"
+msgstr "Bad Request"
+
+msgid "error_3"
+msgstr "Validation Error"
+
+msgid "error_4"
+msgstr "Permission Denied"
+
+msgid "error_5"
+msgstr "Object Not Found"
+
+msgid "error_6"
+msgstr "Object Already Exists"

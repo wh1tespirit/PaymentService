@@ -1,0 +1,29 @@
+version: "3.1"
+
+networks:
+  monitoring:
+    driver: bridge
+
+services:
+  main-worker:
+    build:
+      context: ../
+      dockerfile: ./common/dockerimages/python.Dockerfile
+    volumes:
+      - ../:/code
+    restart: always
+    command: sh -c "watchmedo auto-restart --recursive --patterns='*.py' -- arq arq_worker.workers.MainWorker"
+    networks:
+      - monitoring
+
+  arq_worker-filebeat:
+    build:
+      context: .
+      dockerfile: ../common/dockerimages/filebeat.Dockerfile
+    volumes:
+      - ./logs:/code/logs:ro # Логи для наблюдения
+      - ../common/certs/:/code/certs:ro # Сертификат для logstash
+      - ./filebeat.yml:/code/filebeat.yml:ro # Конфиг filebeat
+      - ./filebeat:/var/lib/filebeat # Хранилище для filebeat (если не указать, то после каждого запуска filebeat будет собирать все логи заново)
+    networks:
+      - monitoring

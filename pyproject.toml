@@ -1,0 +1,57 @@
+[project]
+name = "fastapi-template"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "arq>=0.26.3",
+    "babel>=2.17.0",
+    "beanie>=1.29.0",
+    "dotenv>=0.9.9",
+    "fastapi>=0.115.12",
+    "motor>=3.7.0",
+    "prometheus-client>=0.21.1",
+    "python-multipart>=0.0.20",
+    "pytz>=2025.2",
+    "uvicorn>=0.34.0",
+    "watchdog>=6.0.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+# Выбор правил линтинга
+select = [
+    "A",   # flake8-annotations - проверка аннотаций типов
+    "ARG", # flake8-annotations - проверка аргументов функций
+    "B",   # flake8-bugbear - поиск распространенных ошибок
+    "C4",  # flake8-comprehensions - проверка списковых включений
+    "E",   # pycodestyle errors - проверка стиля кода PEP8
+    "F",   # pyflakes - поиск логических ошибок
+    "I",   # isort - сортировка импортов
+    "N",   # pep8-naming - проверка именования
+    "PIE", # flake8-pie - различные улучшения кода
+    "PYI", # pyright - статический анализ типов
+    "RUF", # ruff-specific rules - специфичные правила Ruff
+    "SIM", # flake8-simplify - упрощение кода
+    "TRY", # tryceratops - обработка исключений
+    "UP",  # pyupgrade - обновление синтаксиса Python
+]
+
+# Игнорируемые правила
+ignore = [
+    "E203",   # Пробел перед ':' (black форматирует по-другому)
+    "E501",   # Слишком длинная строка (уже контролируется параметром line-length)
+    "RUF002", # Строка документации содержит неоднозначные переменные типов
+    "RUF003", # Строка документации содержит неоднозначные переменные типов
+    "ARG001", # Аргумент функции не используется
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true

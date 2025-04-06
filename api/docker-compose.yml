@@ -1,0 +1,60 @@
+version: "3.1"
+
+networks:
+  monitoring:
+    driver: bridge
+
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: ./common/dockerimages/python.Dockerfile
+    expose:
+      - 1337
+    volumes:
+      - ../:/code
+    restart: always
+    command: sh -c "pybabel compile -d api/translations --use-fuzzy && watchmedo auto-restart --recursive --patterns='*.py' -- uvicorn api.asgi:app --host 0.0.0.0 --port 1337 --workers 1 --reload-dir ./api --limit-max-requests 3600"
+    networks:
+      - monitoring
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../common/certs/cert.pem:/ssl/cert.pem:ro
+      - ../common/certs/privkey.key:/ssl/privkey.key:ro
+    links:
+      - api
+    networks:
+      - monitoring
+
+  api-filebeat:
+    build:
+      context: .
+      dockerfile: ../common/dockerimages/filebeat.Dockerfile
+    volumes:
+      - ./logs:/code/logs:ro # Логи для наблюдения
+      - ../common/certs/:/code/certs:ro # Сертификат для logstash
+      - ./filebeat.yml:/code/filebeat.yml:ro # Конфиг filebeat
+      - ./filebeat:/var/lib/filebeat # Хранилище для filebeat (если не указать, то после каждого запуска filebeat будет собирать все логи заново)
+    networks:
+      - monitoring
+
+  api-prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro # конфиг prometheus
+      - ./prometheus_storage:/prometheus # хранилище для prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml # конфиг prometheus
+      - --storage.tsdb.retention.time=7d # время хранения данных
+      - --log.level=debug # уровень логирования
+    networks:
+      - monitoring
