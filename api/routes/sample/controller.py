@@ -10,5 +10,5 @@ async def get_samples(mongo: MongoTypeDI):
 
 async def create_sample(payload: CreateSampleRequest, mongo: MongoTypeDI):
     sample = SampleModel(**payload.md())
-    await mongo.samples.insert(sample)
+    await mongo.samples.insert_one(sample)
     return sample

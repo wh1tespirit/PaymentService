@@ -32,8 +32,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                 method=request.method,
                 url=str(request.url.path),
                 path_params=request.path_params,
-                query_params=request.query_params,
-                headers=request.headers,
+                query_params=dict(request.query_params),
+                headers=dict(request.headers),
                 cookies=request.cookies,
             ),
         )
