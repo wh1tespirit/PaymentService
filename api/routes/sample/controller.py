@@ -4,7 +4,7 @@ from common.mongo.models.sample import SampleModel
 
 
 async def get_samples(mongo: MongoTypeDI):
-    samples = await mongo.samples.find_many({})
+    samples = await mongo.samples.find_many({}, use_cache=True)
     return samples
 
 

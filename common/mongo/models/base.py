@@ -1,15 +1,13 @@
 from datetime import datetime
 
-from pydantic import ConfigDict, Field
+from pydantic import Field
 
 from common.pydantic.base import BaseModel as PydanticBaseModel
 from common.utils import generate_object_id, get_utc_datetime
 
 
-class MongoBaseModel(PydanticBaseModel):
+class BaseMongoModel(PydanticBaseModel):
     id: str = Field(default_factory=generate_object_id, alias="_id")
-
-    model_config = ConfigDict(populate_by_name=True)
 
     def to_upt(self, exclude: set[str] | None = None):
         if exclude is None:
@@ -24,7 +22,7 @@ class MongoBaseModel(PydanticBaseModel):
             setattr(self, key, value)
 
 
-class MongoBaseModelWithDT(MongoBaseModel):
+class BaseMongoModelWithDT(BaseMongoModel):
     created_at: datetime = Field(default_factory=get_utc_datetime, description="Дата создания")
     updated_at: datetime = Field(default_factory=get_utc_datetime, description="Дата обновления")
 

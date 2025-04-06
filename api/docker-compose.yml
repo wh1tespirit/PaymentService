@@ -33,17 +33,17 @@ services:
     networks:
       - monitoring
 
-  api-filebeat:
-    build:
-      context: .
-      dockerfile: ../common/dockerimages/filebeat.Dockerfile
-    volumes:
-      - ./logs:/code/logs:ro # Логи для наблюдения
-      - ../common/certs/:/code/certs:ro # Сертификат для logstash
-      - ./filebeat.yml:/code/filebeat.yml:ro # Конфиг filebeat
-      - ./filebeat:/var/lib/filebeat # Хранилище для filebeat (если не указать, то после каждого запуска filebeat будет собирать все логи заново)
-    networks:
-      - monitoring
+  # api-filebeat:
+  #   build:
+  #     context: .
+  #     dockerfile: ../common/dockerimages/filebeat.Dockerfile
+  #   volumes:
+  #     - ./logs:/code/logs:ro # Логи для наблюдения
+  #     - ../common/certs/:/code/certs:ro # Сертификат для logstash
+  #     - ./filebeat.yml:/code/filebeat.yml:ro # Конфиг filebeat
+  #     - ./filebeat:/var/lib/filebeat # Хранилище для filebeat (если не указать, то после каждого запуска filebeat будет собирать все логи заново)
+  #   networks:
+  #     - monitoring
 
   api-prometheus:
     image: prom/prometheus:latest

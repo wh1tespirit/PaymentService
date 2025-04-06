@@ -1,6 +1,6 @@
-from common.mongo.models.base import MongoBaseModelWithDT
+from common.mongo.models.base import BaseMongoModelWithDT
 
 
-class SampleModel(MongoBaseModelWithDT):
+class SampleModel(BaseMongoModelWithDT):
     name: str
     description: str
