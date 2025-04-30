@@ -5,7 +5,7 @@ from typing import TypedDict
 
 from arq import ArqRedis
 
-from common.mongo.client import MongoClient
+from common.mongo.client import MongoWorker
 
 
 class ArqContext(TypedDict):
@@ -22,7 +22,7 @@ class ArqLoggerContext(ArqContext):
 
 
 class MongoArqContext(ArqLoggerContext):
-    mongo: MongoClient
+    mongo: MongoWorker
 
 
 class Queues(StrEnum):

@@ -1,9 +1,9 @@
 from common import settings
-from common.mongo.client import MongoClient
+from common.mongo.client import MongoWorker
 
 
 async def mongo_startup_handler(ctx: dict):
-    mongo = MongoClient(settings.MONGO_URI, settings.MONGO_DB)
+    mongo = MongoWorker(settings.MONGO_URI, settings.MONGO_DB)
     await mongo.connect()
     ctx["mongo"] = mongo
 

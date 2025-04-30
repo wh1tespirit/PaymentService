@@ -1,7 +1,7 @@
 from common import settings
-from common.mongo.client import MongoClient
+from common.mongo.client import MongoWorker
 
 
 async def get_mongo_client_di():
-    async with MongoClient(settings.MONGO_URI, settings.MONGO_DB) as client:
+    async with MongoWorker(settings.MONGO_URI, settings.MONGO_DB) as client:
         yield client

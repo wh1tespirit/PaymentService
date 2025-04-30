@@ -5,6 +5,6 @@ class RedisConnectionError(Exception):
 
 
 class RedisSetError(Exception):
-    def __init__(self, key: str, value: str):
+    def __init__(self, key: str, value: str | bytes):
         self.message = f"Failed to set value {value} in Redis with key {key}"
         super().__init__(self.message)

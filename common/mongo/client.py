@@ -6,7 +6,7 @@ from common.mongo.repositories.sample import SampleRepository
 from common.redis.redis import RedisService
 
 
-class MongoClient:
+class MongoWorker:
     client: AsyncIOMotorClient
     db: AsyncIOMotorDatabase
 
@@ -25,7 +25,7 @@ class MongoClient:
         await self.close()
 
     async def connect(self):
-        self.samples = SampleRepository(self.db[Collections.SAMPLE], self.__cache)
+        self.samples = SampleRepository(self.db[Collections.SAMPLES], self.__cache)
 
     async def close(self):
         self.client.close()

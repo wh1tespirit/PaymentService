@@ -4,7 +4,7 @@ import uvicorn
 
 
 async def main():
-    uvicorn.run("api.asgi:app", host="0.0.0.0", port=1337, reload=True)
+    uvicorn.run("api.asgi:app", host="0.0.0.0", port=3000, reload=True)
 
 
 if __name__ == "__main__":
