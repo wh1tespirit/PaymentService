@@ -84,7 +84,7 @@ def get_json_formatter(service_name: ServiceNames):
             try:
                 data = json.loads(message_str)
             except json.JSONDecodeError:
-                data = {"message_str": message_str}
+                data = {"message": message_str}
 
             log_record = {
                 "date": get_moscow_time(),
