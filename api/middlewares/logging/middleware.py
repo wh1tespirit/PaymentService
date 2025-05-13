@@ -23,10 +23,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
         logs = FileLogs(
-            level=Level.OK,
-            date=get_moscow_time(),
-            project_name=settings.PROJECT_NAME,
-            service_name="API",
             nginx_request_id=request.headers.get("X-Request-Id"),
             request=RequestLogs(
                 method=request.method,

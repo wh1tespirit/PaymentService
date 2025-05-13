@@ -28,10 +28,6 @@ class ResponseLogs(BaseModel):
 
 
 class FileLogs(BaseModel):
-    level: Level
-    date: str
-    project_name: str
-    service_name: str
     request: RequestLogs
     response: ResponseLogs = Field(default_factory=ResponseLogs)
     timedelta: float = 0
