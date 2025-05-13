@@ -36,8 +36,7 @@ class RedisService:
         return await self.__client.exists(key)
 
     async def scan(self, pattern: str) -> list[bytes]:
-        result = await self.__client.scan(match=pattern)
-        return result[1]
+        return await self.__client.keys(match=pattern)
 
     async def delete_many(self, keys: list[str] | list[bytes]):
         if not keys:
