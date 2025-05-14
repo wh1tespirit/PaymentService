@@ -4,7 +4,7 @@ filebeat.inputs:
     paths:
       - /code/logs/**/*.log # Путь к логам внутри контейнера
     fields:
-       project: your_project_name_api # Имя проекта с префиксом сервиса
+      project: your_project_name_api # Имя проекта с префиксом сервиса
       type: python_log # Тип лога (по умолчанию лучше оставить python_log)
     fields_under_root: true # Настройки паттерна для объединения логов
     multiline.pattern: '^\[log_start\]' # Настройки паттерна для объединения логов

@@ -8,10 +8,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse, StreamingResponse
 from starlette.types import ASGIApp
 
-from api.middlewares.logging.models import FileLogs, Level, RequestLogs
-from common import settings
+from api.middlewares.logging.models import FileLogs, RequestLogs
 from common.logger import Loggers, ServiceNames, setup_console_logger, setup_file_logger
-from common.utils import get_moscow_time
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
@@ -35,7 +33,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         )
 
         if request.headers.get("Content-Type") == "application/json":
-            logs.request.json_body = json.loads(await request.body())
+            logs.request.data = json.loads(await request.body())
 
         try:
             response: StreamingResponse = await call_next(request)
@@ -48,9 +46,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                 body += chunk if isinstance(chunk, bytes) else chunk.encode()
 
             if response.headers.get("Content-Type") == "application/json":
-                logs.response.body = json.loads(body)
+                logs.response.data = json.loads(body)
             else:
-                logs.response.body = body.decode()
+                logs.response.data = body.decode()
 
             return StarletteResponse(
                 content=body,
@@ -60,11 +58,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             )
 
         except Exception as e:
-            logs.level = Level.ERROR
             logs.traceback = traceback.format_exc()
             logs.exception = str(e)
             raise
 
         finally:
             logs.timedelta = round(time.time() - start_time, 3)
-            self.file_logger.info(logs.md_json())
+            self.file_logger.info(None, logs.md())

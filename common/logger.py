@@ -78,21 +78,18 @@ def setup_file_logger(
 
 def get_json_formatter(service_name: ServiceNames):
     class JSONFormatter(logging.Formatter):
-        def format(self, record):
-            message_str = record.getMessage()
-
-            try:
-                data = json.loads(message_str)
-            except json.JSONDecodeError:
-                data = {"message": message_str}
-
-            log_record = {
+        def format(self, record: logging.LogRecord):
+            log_record: dict = {
                 "date": get_moscow_time(),
                 "project_name": settings.PROJECT_NAME,
                 "service_name": service_name.value,
                 "level": record.levelname,
-                "data": data,
+                "message": record.getMessage(),
             }
+
+            if record.args:
+                log_record.update(record.args)  # type: ignore
+
             if record.exc_info:
                 exc_type, exc_value, exc_traceback = record.exc_info
                 log_record["exception"] = f"{exc_type.__name__}: {exc_value}"

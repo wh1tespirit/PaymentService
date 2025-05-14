@@ -18,13 +18,13 @@ class RequestLogs(BaseModel):
     query_params: dict[str, str]
     headers: dict[str, str]
     cookies: dict[str, str]
-    json_body: Any | None = None
+    data: Any | None = None
 
 
 class ResponseLogs(BaseModel):
     status_code: int | None = None
     headers: dict[str, str] = Field(default_factory=dict)
-    body: Any | None = None
+    data: Any | None = None
 
 
 class FileLogs(BaseModel):
