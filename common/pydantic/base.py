@@ -4,7 +4,11 @@ from pydantic import BaseModel as PydanticBaseModel, ConfigDict
 
 
 class BaseModel(PydanticBaseModel):
-    model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True)
+    model_config = ConfigDict(
+        populate_by_name=True,
+        str_strip_whitespace=True,
+        from_attributes=True,
+    )
 
     def md(
         self,

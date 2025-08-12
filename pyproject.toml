@@ -5,15 +5,20 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.16.4",
     "arq>=0.26.3",
+    "asyncpg>=0.30.0",
     "babel>=2.17.0",
-    "beanie>=1.29.0",
+    "dishka>=1.6.0",
     "dotenv>=0.9.9",
     "fastapi>=0.115.12",
-    "motor>=3.7.0",
+    "greenlet>=3.2.4",
     "prometheus-client>=0.21.1",
+    "pydantic>=2.11.1",
     "python-multipart>=0.0.20",
     "pytz>=2025.2",
+    "scalar-fastapi>=1.2.3",
+    "sqlalchemy>=2.0.43",
     "uvicorn>=0.34.0",
     "watchdog>=6.0.0",
 ]
@@ -21,7 +26,6 @@ dependencies = [
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-
 [tool.ruff.lint]
 # Выбор правил линтинга
 select = [
@@ -45,9 +49,15 @@ select = [
 ignore = [
     "E203",   # Пробел перед ':' (black форматирует по-другому)
     "E501",   # Слишком длинная строка (уже контролируется параметром line-length)
+    "RUF001", # Строка документации содержит неоднозначные переменные типов
     "RUF002", # Строка документации содержит неоднозначные переменные типов
     "RUF003", # Строка документации содержит неоднозначные переменные типов
-    "ARG001", # Аргумент функции не используется
+    "ARG001", # Аргументы функции не используются
+    "ARG002", # Аргументы метода не используются
+    "ARG003", # Аргументы класса не используются
+    "TRY003",  # Исключение слишком широкое (except Exception)
+    "TRY301",  # Исключение слишком широкое (except BaseException)
+    "F403"     # Импорт * запрещен
 ]
 
 [tool.ruff.lint.per-file-ignores]

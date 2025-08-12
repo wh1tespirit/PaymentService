@@ -1,16 +1,16 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
+from api.core.errors.handlers.all import handle_all_exceptions
+from api.core.errors.handlers.app import app_exception_handler
+from api.core.errors.handlers.validation import validation_exception_handler
+from api.core.openapi import RESPONSES
 from api.middlewares.logging.middleware import LoggingMiddleware
-from api.middlewares.metrics.middleware import MetricMiddleware
-from api.routes.metrics.router import router as metrics_router
-from api.routes.sample.router import router as sample_router
-from api.utils.errors import CustomHTTPError
-from api.utils.ex_handlers.all import handle_all_exceptions
-from api.utils.ex_handlers.custom import custom_exception_handler
-from api.utils.ex_handlers.validation import validation_exception_handler
-from api.utils.openapi import RESPONSES
+from api.middlewares.translations.middleware import TranslationMiddleware
+from api.routes.docs.router import router as docs_router
+from api.routes.samples.router import router as samples_router
 from common import settings
+from common.errors import AppError
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -19,11 +19,11 @@ app = FastAPI(
 
 
 app.add_middleware(LoggingMiddleware)
-app.add_middleware(MetricMiddleware)
+app.add_middleware(TranslationMiddleware)
 
 app.exception_handler(RequestValidationError)(validation_exception_handler)
-app.exception_handler(CustomHTTPError)(custom_exception_handler)
+app.exception_handler(AppError)(app_exception_handler)
 app.exception_handler(Exception)(handle_all_exceptions)
 
-app.include_router(sample_router)
-app.include_router(metrics_router)
+app.include_router(docs_router)
+app.include_router(samples_router)

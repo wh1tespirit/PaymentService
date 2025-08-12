@@ -1,0 +1,53 @@
+{$DOMAINS:localhost} {
+    # Сжатие
+    encode gzip
+
+    header {
+        # CORS для всех методов
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD, PUT, DELETE, PATCH"
+        Access-Control-Max-Age 86400
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Headers "Origin,Content-Type,Accept,Authorization,User-Agent,Referer,Keep-Alive,Range,DNT,Cache-Control,X-Requested-With,If-Modified-Since,If-None-Match,If-Match,Force-Cache-Control,Localization"
+        Access-Control-Expose-Headers "Cache-Control,Content-Language,Content-Length,Content-Type,Expires,Last-Modified,Pragma,Content-Range"
+        
+        # Безопасность
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy strict-origin-when-cross-origin
+        
+        # Производительность
+        X-Request-Id {http.request.header.X-Request-Id}
+    }
+
+    # OPTIONS запросы
+     @options {
+        method OPTIONS
+    }
+    handle @options {
+        header {
+            Access-Control-Allow-Origin *
+            Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD, PUT, DELETE, PATCH"
+            Access-Control-Max-Age 1728000
+            Access-Control-Allow-Credentials true
+            Access-Control-Allow-Headers "Origin,Content-Type,Accept,Authorization,User-Agent,Referer,Keep-Alive,Range,DNT,Cache-Control,X-Requested-With,If-Modified-Since,If-None-Match,If-Match,Force-Cache-Control,Localization"
+            Access-Control-Expose-Headers "Cache-Control,Content-Language,Content-Length,Content-Type,Expires,Last-Modified,Pragma,Content-Range"
+        }
+        respond 204
+    }
+
+    # Защита от ботов
+    @bot {
+        header User-Agent "*bot*"
+    }
+    respond @bot 403
+
+    reverse_proxy api:1337 {
+        transport http {
+            response_header_timeout 60s    # Таймаут получения заголовков ответа
+            dial_timeout 60s               # Таймаут установки соединения
+            expect_continue_timeout 10s     # Таймаут для Expect: 100-continue
+        }
+    }
+}

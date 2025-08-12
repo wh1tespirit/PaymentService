@@ -33,8 +33,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         )
 
         if request.headers.get("Content-Type") == "application/json":
-            logs.request.data = json.loads(await request.body())
-
+            try:
+                logs.request.data = json.loads(await request.body())
+            except Exception:
+                logs.request.data = {}
         try:
             response: StreamingResponse = await call_next(request)
             logs.response.headers = dict(response.headers)

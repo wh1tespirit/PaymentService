@@ -185,3 +185,6 @@ testing.env
 
 # Logs
 **/*.logs
+
+# Caddy
+api/caddy_data

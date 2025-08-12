@@ -6,7 +6,7 @@ from enum import StrEnum
 from pathlib import Path
 
 from common import settings
-from common.utils import get_moscow_time
+from common.utils import now_utc
 
 # Logging Levels
 # https://docs.python.org/3/library/logging.html#logging-levels
@@ -80,7 +80,7 @@ def get_json_formatter(service_name: ServiceNames):
     class JSONFormatter(logging.Formatter):
         def format(self, record: logging.LogRecord):
             log_record: dict = {
-                "date": get_moscow_time(),
+                "date": now_utc().isoformat(),
                 "project_name": settings.PROJECT_NAME,
                 "service_name": service_name.value,
                 "level": record.levelname,

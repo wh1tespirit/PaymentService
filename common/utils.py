@@ -1,25 +1,10 @@
-import secrets
-from datetime import datetime
-
-import pytz
-from bson import ObjectId
+import uuid
+from datetime import UTC, datetime
 
 
-def generate_object_id():
-    return str(ObjectId())
+def generate_uuid():
+    return uuid.uuid4().hex
 
 
-def generate_token(nbytes: int):
-    return secrets.token_hex(nbytes)
-
-
-def get_moscow_time() -> str:
-    return str(datetime.now(pytz.timezone("Europe/Moscow")))
-
-
-def get_moscow_time_in_datetime() -> datetime:
-    return datetime.now(pytz.timezone("Europe/Moscow"))
-
-
-def get_utc_datetime() -> datetime:
-    return datetime.now(pytz.utc)
+def now_utc():
+    return datetime.now(UTC)

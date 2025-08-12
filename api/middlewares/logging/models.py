@@ -1,14 +1,8 @@
-from enum import StrEnum
 from typing import Any
 
 from pydantic import Field
 
 from common.pydantic.base import BaseModel
-
-
-class Level(StrEnum):
-    OK = "OK"
-    ERROR = "ERROR"
 
 
 class RequestLogs(BaseModel):
