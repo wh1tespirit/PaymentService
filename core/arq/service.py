@@ -5,18 +5,19 @@ from typing import Any
 from arq import ArqRedis, create_pool
 from arq.connections import RedisSettings
 from arq.jobs import Job
-
-from common import settings
-
-REDIS_SETTINGS = RedisSettings(host=settings.REDIS_HOST, port=settings.REDIS_PORT, password=settings.REDIS_PASSWORD)
+from arq_worker.utils.types import Queues
 
 
-class ArqWorker:
+class ArqService:
     pool: ArqRedis
     redis_settings: RedisSettings
 
-    def __init__(self):
-        self.redis_settings = REDIS_SETTINGS
+    def __init__(self, host: str, port: int, password: str):
+        self.redis_settings = RedisSettings(
+            host=host,
+            port=port,
+            password=password,
+        )
 
     async def __aenter__(self):
         await self.connect()
@@ -33,9 +34,9 @@ class ArqWorker:
 
     async def add_job(
         self,
-        function: Callable,
+        function: Callable | str,
         job_id: str | None = None,
-        queue_name: str | None = None,
+        queue_name: str | None = Queues.MAIN_QUEUE,
         defer_until: datetime | None = None,
         defer_by: None | float | timedelta = None,
         expires: None | float | timedelta = None,
@@ -43,7 +44,7 @@ class ArqWorker:
         **kwargs: Any,
     ):
         return await self.pool.enqueue_job(
-            function=function.__name__,
+            function=function.__name__ if isinstance(function, Callable) else function,
             _job_id=job_id,
             _queue_name=queue_name,
             _defer_until=defer_until,
@@ -53,9 +54,14 @@ class ArqWorker:
             **kwargs,
         )
 
-    async def abort_job(self, job_id: str):
-        job = Job(job_id=job_id, redis=self.pool)
-        await job.abort()
+    async def abort_job(
+        self,
+        job_id: str,
+        queue_name: str = Queues.MAIN_QUEUE,
+        timeout: int | None = None,
+    ):
+        job = Job(job_id=job_id, redis=self.pool, _queue_name=queue_name)
+        await job.abort(timeout=timeout)
 
     async def get_job(self, job_id: str):
         job = Job(job_id=job_id, redis=self.pool)

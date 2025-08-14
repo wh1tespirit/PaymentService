@@ -4,8 +4,7 @@ from logging import Logger
 from typing import TypedDict
 
 from arq import ArqRedis
-
-from common.mongo.client import MongoWorker
+from dishka import AsyncContainer
 
 
 class ArqContext(TypedDict):
@@ -14,16 +13,11 @@ class ArqContext(TypedDict):
     job_try: int
     enqueue_time: datetime
     score: int
-
-
-class ArqLoggerContext(ArqContext):
     console_logger: Logger
     file_logger: Logger
-
-
-class MongoArqContext(ArqLoggerContext):
-    mongo: MongoWorker
+    container: AsyncContainer
 
 
 class Queues(StrEnum):
-    SAMPLE_QUEUE = "sample_queue"
+    MAIN_QUEUE = "main_queue"
+    CRON_QUEUE = "cron_queue"
