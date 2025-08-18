@@ -13,11 +13,7 @@ class ArqService:
     redis_settings: RedisSettings
 
     def __init__(self, host: str, port: int, password: str):
-        self.redis_settings = RedisSettings(
-            host=host,
-            port=port,
-            password=password,
-        )
+        self.redis_settings = RedisSettings(host=host, port=port, password=password, database=1)
 
     async def __aenter__(self):
         await self.connect()
