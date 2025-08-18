@@ -20,10 +20,10 @@ def import_all_models():
 
     for module_info in pkgutil.iter_modules([str(core_path)]):
         try:
-            # Пытаемся импортировать model.py из каждого модуля
+            # Пытаемся импортировать models.py из каждого модуля
             importlib.import_module(f"core.{module_info.name}.models")
         except ImportError:
-            # Модуль без model.py - пропускаем
+            # Модуль без models.py - пропускаем
             continue
 
 
