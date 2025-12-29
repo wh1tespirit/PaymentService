@@ -1,8 +1,5 @@
 import asyncio
-import importlib
-import pkgutil
 from logging.config import fileConfig
-from pathlib import Path
 
 from alembic import context
 from sqlalchemy import pool
@@ -11,21 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from common import settings
 from common.models.base import Base
-
-
-# Автоматический импорт всех моделей
-def import_all_models():
-    """Автоматически импортирует все модели из core/*/models.py"""
-    core_path = Path(__file__).parent.parent / "core"
-
-    for module_info in pkgutil.iter_modules([str(core_path)]):
-        try:
-            # Пытаемся импортировать models.py из каждого модуля
-            importlib.import_module(f"core.{module_info.name}.models")
-        except ImportError:
-            # Модуль без models.py - пропускаем
-            continue
-
+from common.utils import import_all_models
 
 # Импортируем все модели
 import_all_models()

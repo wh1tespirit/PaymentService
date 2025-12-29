@@ -1,23 +1,8 @@
-import importlib
-import pkgutil
-from pathlib import Path
 
 from dishka import make_async_container
 
+from common.utils import collect_providers, import_all_models
 
-def collect_providers():
-    providers = []
-    core_path = Path(__file__).parent.parent / "core"
-
-    for module_info in pkgutil.iter_modules([str(core_path)]):
-        try:
-            module = importlib.import_module(f"core.{module_info.name}.providers")
-            if hasattr(module, "providers"):
-                providers.extend(module.providers)
-        except ImportError:
-            continue  # Модуль без провайдеров
-
-    return providers
-
+import_all_models()
 
 Container = make_async_container(*collect_providers())
