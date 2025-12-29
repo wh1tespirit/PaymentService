@@ -8,7 +8,7 @@ from common.db.connect import Session
 
 
 class SessionProvider(Provider):
-    @provide(scope=Scope.REQUEST)
+    @provide(scope=Scope.REQUEST, cache=False) # Отключаем кеширование сессии, чтобы каждое получение = новая сессия
     async def init(self) -> AsyncGenerator[AsyncSession, Any]:
         async with Session() as session:
             yield session
