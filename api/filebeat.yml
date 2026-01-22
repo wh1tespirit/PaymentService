@@ -13,6 +13,6 @@ filebeat.inputs:
 
 output.logstash:
   hosts: ["receiver.rlt.pw:5044"] # IP и порт Logstash
-  ssl.certificate_authorities: ["/code/certs/logstash_ca.crt"]
-  ssl.certificate: "/code/certs/logstash_client.crt"
-  ssl.key: "/code/certs/logstash_client.key"
+  ssl:
+    certificate_authorities: ["/code/certs/logstash_ca.crt"]
+    verification_mode: full
