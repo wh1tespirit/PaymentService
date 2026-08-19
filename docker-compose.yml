@@ -26,5 +26,36 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: common/dockerimages/python.Dockerfile
+    command: sh -c "alembic upgrade head && uvicorn api.asgi:app --host 0.0.0.0 --port 8000"
+    environment: &app_env
+      DATABASE_URI: postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
+      RABBITMQ_URI: amqp://guest:guest@rabbitmq:5672/
+      API_KEY: ${API_KEY:-secret-api-key}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  consumer:
+    build:
+      context: .
+      dockerfile: common/dockerimages/python.Dockerfile
+    command: faststream run consumer.app:app
+    environment: *app_env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
 volumes:
   pgdata:
