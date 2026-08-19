@@ -88,3 +88,23 @@ async def test_invalid_body_returns_422(client):
     bad = {**BODY, "amount": "-5", "currency": "GBP"}
     resp = await client.post("/api/v1/payments", json=bad, headers=HEADERS)
     assert resp.status_code == 422
+
+
+async def test_get_payment_returns_details(client):
+    from tests.factories import create_pending_payment
+
+    payment = await create_pending_payment(description="Заказ №1", metadata_={"order_id": 42})
+    resp = await client.get(f"/api/v1/payments/{payment.id}", headers={"X-API-Key": "test-api-key"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["payment_id"] == payment.id
+    assert data["status"] == "pending"
+    assert data["currency"] == "RUB"
+    assert data["metadata"] == {"order_id": 42}
+    assert data["webhook_url"] == "http://localhost:9000/webhook"
+    assert data["processed_at"] is None
+
+
+async def test_get_unknown_payment_returns_404(client):
+    resp = await client.get("/api/v1/payments/no-such-id", headers={"X-API-Key": "test-api-key"})
+    assert resp.status_code == 404

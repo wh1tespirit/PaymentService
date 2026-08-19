@@ -7,13 +7,14 @@ from api.core.dependencies.auth import AuthApiKeyDI
 from api.core.dependencies.container import ContainerTypeDI
 from api.core.enums import Tags
 from api.routes.payments.schemas.payments_req import CreatePaymentReq
-from api.routes.payments.schemas.payments_resp import PaymentCreatedResp
+from api.routes.payments.schemas.payments_resp import PaymentCreatedResp, PaymentResp
 
 from . import controller
 
 router = APIRouter(prefix="/api/v1/payments", tags=[Tags.PAYMENTS], dependencies=[AuthApiKeyDI])
 
 ROOT = ""
+PAYMENT_ID = "/{payment_id}"
 
 
 @router.post(ROOT, response_model=PaymentCreatedResp, status_code=HTTPStatus.ACCEPTED)
@@ -23,3 +24,8 @@ async def create_payment(
     idempotency_key: Annotated[str, Header(min_length=1)],
 ):
     return await controller.create_payment(container, model, idempotency_key)
+
+
+@router.get(PAYMENT_ID, response_model=PaymentResp)
+async def get_payment(container: ContainerTypeDI, payment_id: str):
+    return await controller.get_payment(container, payment_id)

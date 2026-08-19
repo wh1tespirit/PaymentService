@@ -22,6 +22,9 @@ async def create_tables():
     yield
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+        # Без сброса версии alembic следующий `alembic upgrade head`
+        # окажется no-op и оставит БД без схемы.
+        await conn.execute(text("DROP TABLE IF EXISTS alembic_version"))
 
 
 @pytest_asyncio.fixture(autouse=True)
