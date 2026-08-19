@@ -1,7 +1,7 @@
 [project]
-name = "fastapi-template"
+name = "payment-service"
 version = "0.1.0"
-description = "Add your description here"
+description = "Payment service"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

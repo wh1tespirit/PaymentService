@@ -141,7 +141,7 @@ wheels = [
 ]
 
 [[package]]
-name = "fastapi-template"
+name = "payment-service"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
