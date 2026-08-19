@@ -15,13 +15,13 @@ from common.utils import now_utc
 class Loggers(StrEnum):
     API_CONSOLE = "api_console"
     API_FILE = "api_file"
-    ARQ_CONSOLE = "arq_console"
-    ARQ_FILE = "arq_file"
+    CONSUMER_CONSOLE = "consumer_console"
+    CONSUMER_FILE = "consumer_file"
 
 
 class ServiceNames(StrEnum):
     API = "api"
-    ARQ_WORKER = "arq_worker"
+    CONSUMER = "consumer"
 
 
 class Formatters(StrEnum):
@@ -91,7 +91,7 @@ def get_json_formatter(service_name: ServiceNames):
                 log_record.update(record.args)  # type: ignore
 
             if record.exc_info:
-                exc_type, exc_value, exc_traceback = record.exc_info
+                exc_type, exc_value, _ = record.exc_info
                 log_record["exception"] = f"{exc_type.__name__}: {exc_value}"
                 log_record["traceback"] = str(traceback.format_exc())
 

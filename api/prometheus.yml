@@ -1,9 +1,0 @@
-global:
-  scrape_interval: 15s # как часто опрашивать метрики
-  scrape_timeout: 15s
-
-scrape_configs:
-  - job_name: "api" # имя задачи
-    static_configs:
-      - targets: ["api:1337"] # адрес API
-    metrics_path: /metrics/ # роут к метрикам

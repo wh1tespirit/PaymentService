@@ -14,17 +14,15 @@ PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 
 DATABASE_URI = os.getenv("DATABASE_URI", "")
 
+RABBITMQ_URI = os.getenv("RABBITMQ_URI", "")
 
-DEFAULT_LOCALE = "ru"
-
-# PROMETHEUS
-PROMETHEUS_MULTIPROC_DIR = os.getenv("PROMETHEUS_MULTIPROC_DIR", "")
-
-# REDIS
-REDIS_HOST = os.getenv("REDIS_HOST", "")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
-
-
-# OPENAPI
+# AUTH
+API_KEY = os.getenv("API_KEY", "")
 OPENAPI_TOKEN = os.getenv("OPENAPI_TOKEN", "")
+
+# CONSUMER
+WEBHOOK_TIMEOUT = float(os.getenv("WEBHOOK_TIMEOUT", 10))
+
+# OUTBOX RELAY
+OUTBOX_POLL_INTERVAL = float(os.getenv("OUTBOX_POLL_INTERVAL", 0.5))
+OUTBOX_BATCH_SIZE = int(os.getenv("OUTBOX_BATCH_SIZE", 100))
