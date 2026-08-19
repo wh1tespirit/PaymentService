@@ -2,6 +2,7 @@ import uuid
 from decimal import Decimal
 
 from common.db.connect import Session
+from core.outbox.models import OutboxModel
 from core.payment.models import PaymentModel
 
 
@@ -19,3 +20,12 @@ async def create_pending_payment(**overrides) -> PaymentModel:
         await session.commit()
         await session.refresh(payment)
         return payment
+
+
+async def create_outbox_event(payment_id: str = "p-1") -> OutboxModel:
+    async with Session() as session:
+        event = OutboxModel(event_type="payment.created", payload={"payment_id": payment_id})
+        session.add(event)
+        await session.commit()
+        await session.refresh(event)
+        return event
