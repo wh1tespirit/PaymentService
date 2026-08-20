@@ -1,28 +1,36 @@
+from collections.abc import Mapping
+from typing import Any
+
 from faststream.rabbit import RabbitBroker
 
-from common.broker import DLQ_NAME, MAX_ATTEMPTS, retry_queue_name
+from common.broker import ATTEMPT_HEADER, DLQ_NAME, MAX_ATTEMPTS, retry_queue_name
+
+
+def read_attempt(headers: Mapping[str, Any]) -> int:
+    """Число уже сделанных ретраев (0 при первой доставке).
+
+    Битый заголовок не должен ронять обработчик: сообщение с мусором в
+    x-attempt лучше провести через полный цикл ретраев, чем потерять.
+    """
+    try:
+        return int(headers.get(ATTEMPT_HEADER, 0))
+    except (TypeError, ValueError):
+        return 0
 
 
 async def route_failure(broker: RabbitBroker, payload: dict, attempt: int) -> None:
     """Маршрутизирует упавшее сообщение: retry с экспоненциальной задержкой или DLQ.
 
-    attempt — число уже сделанных ретраев (из заголовка x-attempt, 0 при
-    первой доставке). Публикация идёт через default exchange по имени
-    очереди; из retry-очереди сообщение вернётся в payments.new через DLX.
+    Публикация идёт через default exchange по имени очереди; из retry-очереди
+    сообщение вернётся в payments.new через DLX.
     """
-    if attempt >= MAX_ATTEMPTS:
-        await broker.publish(
-            payload,
-            queue=DLQ_NAME,
-            headers={"x-attempt": attempt},
-            persist=True,
-        )
-        return
+    exhausted = attempt >= MAX_ATTEMPTS
+    next_attempt = attempt if exhausted else attempt + 1
+    queue = DLQ_NAME if exhausted else retry_queue_name(next_attempt)
 
-    next_attempt = attempt + 1
     await broker.publish(
         payload,
-        queue=retry_queue_name(next_attempt),
-        headers={"x-attempt": next_attempt},
+        queue=queue,
+        headers={ATTEMPT_HEADER: next_attempt},
         persist=True,
     )

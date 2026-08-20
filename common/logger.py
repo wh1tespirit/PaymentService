@@ -16,12 +16,10 @@ class Loggers(StrEnum):
     API_CONSOLE = "api_console"
     API_FILE = "api_file"
     CONSUMER_CONSOLE = "consumer_console"
-    CONSUMER_FILE = "consumer_file"
 
 
 class ServiceNames(StrEnum):
     API = "api"
-    CONSUMER = "consumer"
 
 
 class Formatters(StrEnum):

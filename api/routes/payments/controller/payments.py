@@ -1,4 +1,3 @@
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.core.dependencies.container import ContainerTypeDI
@@ -12,22 +11,15 @@ from core.payment.models import PaymentModel
 
 async def create_payment(container: ContainerTypeDI, model: CreatePaymentReq, idempotency_key: str):
     case = await container.get(CreatePaymentCase)
-    dto = CreatePaymentDTO(
-        amount=model.amount,
-        currency=model.currency,
-        description=model.description,
-        metadata=model.metadata,
-        webhook_url=str(model.webhook_url),
-        idempotency_key=idempotency_key,
-    )
+    # mode="json" заодно приводит HttpUrl к строке.
+    dto = CreatePaymentDTO(**model.md(mode="json"), idempotency_key=idempotency_key)
     payment = await case.execute(dto)
     return PaymentCreatedResp.model_validate(payment)
 
 
 async def get_payment(container: ContainerTypeDI, payment_id: str):
     session = await container.get(AsyncSession)
-    smt = select(PaymentModel).where(PaymentModel.id == payment_id)
-    payment = (await session.execute(smt)).scalar_one_or_none()
+    payment = await session.get(PaymentModel, payment_id)
     if not payment:
         raise AppError(
             message="Payment not found",

@@ -1,10 +1,29 @@
-from common.broker import DLQ, PAYMENTS_EXCHANGE, PAYMENTS_QUEUE, RETRY_QUEUES, retry_queue_name
+from common.broker import (
+    DLQ,
+    MAX_ATTEMPTS,
+    PAYMENTS_EXCHANGE,
+    PAYMENTS_QUEUE,
+    RETRY_DELAYS_MS,
+    RETRY_QUEUES,
+    retry_queue_name,
+)
 
 
 def test_main_queue_and_exchange():
     assert PAYMENTS_EXCHANGE.name == "payments"
     assert PAYMENTS_QUEUE.name == "payments.new"
     assert PAYMENTS_QUEUE.durable is True
+
+
+def test_main_queue_dead_letters_to_dlq():
+    """Reject без requeue (дефолт FastStream) должен приводить в DLQ, а не в никуда."""
+    assert PAYMENTS_QUEUE.arguments["x-dead-letter-exchange"] == "payments"
+    assert PAYMENTS_QUEUE.arguments["x-dead-letter-routing-key"] == "payments.new.dlq"
+    assert DLQ.routing_key == "payments.new.dlq"
+
+
+def test_max_attempts_follows_retry_delays():
+    assert MAX_ATTEMPTS == len(RETRY_DELAYS_MS) == len(RETRY_QUEUES)
 
 
 def test_retry_queues_exponential_ttl_and_dlx():

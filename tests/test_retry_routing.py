@@ -1,6 +1,13 @@
 from unittest.mock import AsyncMock
 
-from consumer.retry import route_failure
+from consumer.retry import read_attempt, route_failure
+
+
+def test_read_attempt_defaults_to_zero_and_survives_garbage():
+    assert read_attempt({}) == 0
+    assert read_attempt({"x-attempt": 2}) == 2
+    assert read_attempt({"x-attempt": "не число"}) == 0
+    assert read_attempt({"x-attempt": None}) == 0
 
 
 async def test_first_failure_goes_to_retry_1():

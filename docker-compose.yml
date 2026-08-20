@@ -31,10 +31,13 @@ services:
       context: .
       dockerfile: common/dockerimages/python.Dockerfile
     command: sh -c "alembic upgrade head && uvicorn api.asgi:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
     environment: &app_env
+      PROJECT_NAME: PaymentService
       DATABASE_URI: postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
       RABBITMQ_URI: amqp://guest:guest@rabbitmq:5672/
       API_KEY: ${API_KEY:-secret-api-key}
+      OPENAPI_TOKEN: ${OPENAPI_TOKEN:-some-admin-token}
     ports:
       - "8000:8000"
     depends_on:
@@ -48,6 +51,7 @@ services:
       context: .
       dockerfile: common/dockerimages/python.Dockerfile
     command: faststream run consumer.app:app
+    restart: unless-stopped
     environment: *app_env
     extra_hosts:
       - "host.docker.internal:host-gateway"

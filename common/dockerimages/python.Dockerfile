@@ -15,4 +15,4 @@ RUN uv pip install -r pyproject.toml --system
 
 COPY . /code/
 
-EXPOSE 22
+EXPOSE 8000

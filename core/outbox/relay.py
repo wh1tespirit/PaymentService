@@ -44,7 +44,12 @@ async def relay_pending_once(publish: PublishFn, batch_size: int) -> int:
 async def run_relay_loop(publish: PublishFn) -> None:
     while True:
         try:
-            await relay_pending_once(publish, settings.OUTBOX_BATCH_SIZE)
+            published = await relay_pending_once(publish, settings.OUTBOX_BATCH_SIZE)
         except Exception:
             logger.exception("Outbox relay iteration failed")
+        else:
+            # Пачка забита целиком — очередь ещё не разобрана, идём за следующей
+            # без паузы, иначе темп разбора упирается в batch_size / poll_interval.
+            if published == settings.OUTBOX_BATCH_SIZE:
+                continue
         await asyncio.sleep(settings.OUTBOX_POLL_INTERVAL)

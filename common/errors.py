@@ -8,6 +8,7 @@ class ApiExceptionCode(Enum):
     ValidationError = 3
     PermissionDenied = 4
     ObjectNotFound = 5
+    Conflict = 6
 
 
 class AppError(Exception):

@@ -90,6 +90,25 @@ async def test_invalid_body_returns_422(client):
     assert resp.status_code == 422
 
 
+async def test_amount_beyond_column_precision_returns_422(client):
+    """Numeric(12, 2): лишние знаки Postgres округлил бы молча, большие числа роняли INSERT."""
+    too_precise = await client.post("/api/v1/payments", json={**BODY, "amount": "10.005"}, headers=HEADERS)
+    too_large = await client.post("/api/v1/payments", json={**BODY, "amount": "99999999999"}, headers=HEADERS)
+
+    assert too_precise.status_code == 422
+    assert too_large.status_code == 422
+    assert await count_rows(PaymentModel) == 0
+
+
+async def test_same_key_with_different_payload_returns_409(client):
+    first = await client.post("/api/v1/payments", json=BODY, headers=HEADERS)
+    second = await client.post("/api/v1/payments", json={**BODY, "amount": "999.00"}, headers=HEADERS)
+
+    assert first.status_code == 202
+    assert second.status_code == 409
+    assert await count_rows(PaymentModel) == 1
+
+
 async def test_get_payment_returns_details(client):
     from tests.factories import create_pending_payment
 

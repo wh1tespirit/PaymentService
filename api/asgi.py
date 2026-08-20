@@ -12,9 +12,10 @@ from api.middlewares.logging.middleware import LoggingMiddleware
 from api.routes.docs.router import router as docs_router
 from api.routes.payments.router import router as payments_router
 from common import settings
-from common.broker import PAYMENTS_EXCHANGE, ROUTING_KEY, create_broker, declare_topology
+from common.broker import create_broker, declare_topology
+from common.container import Container
 from common.errors import AppError
-from core.outbox.models import OutboxModel
+from core.outbox.publisher import make_publisher
 from core.outbox.relay import run_relay_loop
 
 
@@ -24,20 +25,13 @@ async def lifespan(app: FastAPI):
     await broker.connect()
     await declare_topology(broker)
 
-    async def publish_event(event: OutboxModel) -> None:
-        await broker.publish(
-            event.payload,
-            exchange=PAYMENTS_EXCHANGE,
-            routing_key=ROUTING_KEY,
-            persist=True,
-        )
-
-    relay_task = asyncio.create_task(run_relay_loop(publish_event))
+    relay_task = asyncio.create_task(run_relay_loop(make_publisher(broker)))
     yield
     relay_task.cancel()
     with suppress(asyncio.CancelledError):
         await relay_task
     await broker.stop()
+    await Container.close()
 
 
 app = FastAPI(

@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 
 from common.db.connect import Session
@@ -9,12 +11,14 @@ from tests.factories import create_pending_payment
 
 
 class RecordingGateway:
-    def __init__(self, result: PaymentStatus):
+    def __init__(self, result: PaymentStatus, delay: float = 0):
         self.result = result
+        self.delay = delay
         self.calls = 0
 
     async def process(self, payment: PaymentModel) -> PaymentStatus:
         self.calls += 1
+        await asyncio.sleep(self.delay)
         return self.result
 
 
@@ -74,6 +78,22 @@ async def test_redelivery_skips_gateway_but_resends_webhook():
     await run_case(payment.id, gateway, webhook)
 
     assert gateway.calls == 1
+    assert webhook.sent == [payment.id, payment.id]
+
+
+async def test_concurrent_deliveries_call_gateway_once():
+    """Relay даёт at-least-once: две доставки одного платежа могут идти параллельно."""
+    payment = await create_pending_payment()
+    gateway = RecordingGateway(PaymentStatus.SUCCEEDED, delay=0.2)
+    webhook = RecordingWebhook()
+
+    results = await asyncio.gather(
+        run_case(payment.id, gateway, webhook),
+        run_case(payment.id, gateway, webhook),
+    )
+
+    assert gateway.calls == 1
+    assert {p.status for p in results} == {PaymentStatus.SUCCEEDED}
     assert webhook.sent == [payment.id, payment.id]
 
 

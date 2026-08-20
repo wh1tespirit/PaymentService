@@ -1,13 +1,14 @@
 import httpx
 
-from common import settings
 from core.payment.errors import WebhookDeliveryError
 from core.payment.models import PaymentModel
 
 
 class WebhookSender:
-    def __init__(self, timeout: float | None = None):
-        self.timeout = timeout if timeout is not None else settings.WEBHOOK_TIMEOUT
+    """Шлёт уведомление о результате платежа. Клиент общий на процесс — см. провайдер."""
+
+    def __init__(self, client: httpx.AsyncClient):
+        self.client = client
 
     async def send(self, payment: PaymentModel) -> None:
         body = {
@@ -19,8 +20,7 @@ class WebhookSender:
             "processed_at": payment.processed_at.isoformat() if payment.processed_at else None,
         }
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.post(payment.webhook_url, json=body)
+            response = await self.client.post(payment.webhook_url, json=body)
         except httpx.HTTPError as exc:
             raise WebhookDeliveryError(f"Webhook request failed: {exc}") from exc
         if response.status_code // 100 != 2:

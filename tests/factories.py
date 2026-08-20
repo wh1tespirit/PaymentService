@@ -1,7 +1,7 @@
-import uuid
 from decimal import Decimal
 
 from common.db.connect import Session
+from common.utils import generate_uuid
 from core.outbox.models import OutboxModel
 from core.payment.models import PaymentModel
 
@@ -10,7 +10,7 @@ async def create_pending_payment(**overrides) -> PaymentModel:
     fields = {
         "amount": Decimal("100.50"),
         "currency": "RUB",
-        "idempotency_key": uuid.uuid4().hex,
+        "idempotency_key": generate_uuid(),
         "webhook_url": "http://localhost:9000/webhook",
         **overrides,
     }

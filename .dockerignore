@@ -1,6 +1,7 @@
 .idea
 .vscode
 .venv
+envs/
 **/test_data/
 **/testing.py
 testing.env

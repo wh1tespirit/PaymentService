@@ -14,6 +14,7 @@ STATUS_BY_CODE = {
     ApiExceptionCode.ValidationError: HTTPStatus.UNPROCESSABLE_ENTITY,
     ApiExceptionCode.PermissionDenied: HTTPStatus.UNAUTHORIZED,
     ApiExceptionCode.ObjectNotFound: HTTPStatus.NOT_FOUND,
+    ApiExceptionCode.Conflict: HTTPStatus.CONFLICT,
 }
 
 
@@ -23,4 +24,6 @@ async def app_exception_handler(request: Request, exc: AppError):
 
     api_code = exc.api_code or ApiExceptionCode.InternalServerError
     content = ApiResponse.err(message=exc.message, code=api_code, data=exc.api_data)
-    return JSONResponse(status_code=STATUS_BY_CODE[api_code], content=content.md(mode="json"))
+    # .get, а не [], чтобы новый код в enum не ронял сам обработчик ошибок.
+    status = STATUS_BY_CODE.get(api_code, HTTPStatus.INTERNAL_SERVER_ERROR)
+    return JSONResponse(status_code=status, content=content.md(mode="json"))
